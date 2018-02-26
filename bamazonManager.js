@@ -156,68 +156,68 @@ function howMany(id){
 }
 
 function addProduct(){
-    ask.prompt([
-        {
-            message: "What is the NAME of your product?",
-            name: "pname",
-            validate: function(input){
-                let done = this.async();
-                if(input.length > 52)
-                    done('Product names need to be less than 53 characters');
-                if(input.length < 5)
-                    done('Product names must be at lease 5 characters long');
-                done(null,true);
-                
-            }
-        },{
-            message: "What DEPARTMENT is your product in?",
-            name: "dept",
-            validate: function(input){
-                let done = this.async();
-                if(input.length<5)
-                    done('Departments must be greater than 5 characters');
-                if(!/[A-z\s]/.test(input))
-                    done(`Department names can only contain letters`);
-                done(null,true);
-            }
-        },{
-            message: "What is the PRICE of your product?",
-            name: "price",
-            validate: function(input){
-                let done = this.async();
-                if(parseFloat(input) == "NaN")
-                    done(`Prices must be numbers`);
-                if(parseFloat(input) < .01)
-                    done(`Prices must be at least $.01`);
-                done(null,true);
-            }
-        },{
-            message: "What is the STOCK QUANTITY of your product?",
-            name: "qty",
-            validate: function(input){
-                let done = this.async();
-                if(parseInt(input) == "NaN")
-                    done(`Quantities must be numbers`);
-                if(input.indexOf(".") !== -1)
-                    done(`Quantities must be whole numbers`);
-                if(parseInt(input) < 1)
-                    done(`Quantities must be greater than 1`);
-                done(null,true);
-            }
-        }
-    ]).then((res)=>{
-        let newProduct = {
-            product_name:    res.pname,
-            department_name: res.dept,
-            price:           res.price,
-            stock_quantity:  res.qty
-        }
-        con.query("INSERT INTO products SET ?",newProduct,(err,res)=>{
-            if(err) throw err;
-            console.log(`Added ${res.pname} to the databse!`)
-            enterToContinue(menuOptions);
-        })
+    con.query("SELECT * FROM departments",(err,res)=>{
 
+        let depts = []
+        res.forEach(i=>depts.push(i.department_name));
+    
+        ask.prompt([
+            {
+                message: "What is the NAME of your product?",
+                name: "pname",
+                validate: function(input){
+                    let done = this.async();
+                    if(input.length > 52)
+                        done('Product names need to be less than 53 characters');
+                    if(input.length < 5)
+                        done('Product names must be at lease 5 characters long');
+                    done(null,true);
+                    
+                }
+            },{
+                message: "What DEPARTMENT is your product in?",
+                name: "dept",
+                type: "list",
+                choices: depts
+            },{
+                message: "What is the PRICE of your product?",
+                name: "price",
+                validate: function(input){
+                    let done = this.async();
+                    if(parseFloat(input) == "NaN")
+                        done(`Prices must be numbers`);
+                    if(parseFloat(input) < .01)
+                        done(`Prices must be at least $.01`);
+                    done(null,true);
+                }
+            },{
+                message: "What is the STOCK QUANTITY of your product?",
+                name: "qty",
+                validate: function(input){
+                    let done = this.async();
+                    if(parseInt(input) == "NaN")
+                        done(`Quantities must be numbers`);
+                    if(input.indexOf(".") !== -1)
+                        done(`Quantities must be whole numbers`);
+                    if(parseInt(input) < 1)
+                        done(`Quantities must be greater than 1`);
+                    done(null,true);
+                }
+            }
+        ]).then((res)=>{
+            let newProduct = {
+                product_name:    res.pname,
+                department_name: res.dept,
+                price:           res.price,
+                stock_quantity:  res.qty
+            }
+            con.query("INSERT INTO products SET ?",newProduct,(err,res)=>{
+                if(err) throw err;
+                console.log(`Added ${res.pname} to the databse!`)
+                enterToContinue(menuOptions);
+            })
+
+        });
     });
 }
 

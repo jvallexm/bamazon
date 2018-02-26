@@ -23,22 +23,36 @@ function loadEmUp(callback){
     });
 
 }
+
 function line(){
-    console.log(`------------------------------------------------------------------------`);
+    console.log(`------------------------------------------------------------------------------------`);
 }
 function displayAll(arr){
     dbIds = [];
-    console.log("\n************************** WELCOME TO BAMAZON **************************");
-    console.log(`\n   id | Product Name                                          | Price   `);
+    console.log("\n******************************* WELCOME TO BAMAZON *******************************");
+    console.log(`\n   id | Product Name                                          |    Price | Sales  `);
     arr.forEach(i=>{
         dbIds.push(i.id);
         let idSpace      = whiteSpace(i.id.toString().length,5);
         let productSpace = whiteSpace(i.product_name.length,53);
+        let priceSpace   = whiteSpace(i.price.toString().length,7);
+        let price        = formatPrice(i.price)
+        let sales        = formatPrice(i.product_sales)
         line();
-        console.log(`${idSpace}${i.id} | ${i.product_name}${productSpace} | $${i.price}`);
+        console.log(`${idSpace}${i.id} | ${i.product_name}${productSpace} | ${priceSpace}$${price} | $${sales}`);
     });   
     console.log("\nEnter QUIT to exit.");
     whatBuy();
+}
+
+function formatPrice(num){
+    let str = num.toString();
+    if(str.indexOf(".") == -1)
+        return str + ".00";
+    if(str.split(".")[1].length == 1)
+        return str + "0";
+    else
+        return str;
 }
 
 function whatBuy(){
@@ -82,10 +96,12 @@ function howMany(id){
                     console.log("ERROR, INSUFFICIENT QUANTITY");
                     enterToContinue();
                 } else {
-                    let newQty = entry[0].stock_quantity - qty
+                    let newQty = entry[0].stock_quantity - qty;
                     con.query("UPDATE products SET ? WHERE ?",[
                         {
-                            stock_quantity: newQty
+                            stock_quantity: newQty,
+                            product_sales : entry[0].product_sales + (entry[0].price * qty) 
+
                         },{
                             id: id
                         }
