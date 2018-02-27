@@ -209,9 +209,10 @@ function addProduct(){
                 product_name:    res.pname,
                 department_name: res.dept,
                 price:           res.price,
-                stock_quantity:  res.qty
+                stock_quantity:  res.qty,
+                product_sales:   0
             }
-            con.query("INSERT INTO products SET ?",newProduct,(err,res)=>{
+            con.query("INSERT INTO products SET ?",newProduct,(err,r)=>{
                 if(err) throw err;
                 console.log(`Added ${res.pname} to the databse!`)
                 enterToContinue(menuOptions);
@@ -219,11 +220,6 @@ function addProduct(){
 
         });
     });
-}
-
-function throwError(str,callback){
-    console.log("ERROR, " + str);
-    callback();
 }
 
 function enterToContinue(callback){

@@ -29,7 +29,7 @@ function line(){
 }
 function displayAll(arr){
     dbIds = [];
-    console.log("\n******************************* WELCOME TO BAMAZON *******************************");
+    console.log("\n******************************** WELCOME TO BAMAZON ********************************");
     console.log(`\n   id | Product Name                                          |    Price | Sales  `);
     arr.forEach(i=>{
         dbIds.push(i.id);
@@ -59,21 +59,21 @@ function whatBuy(){
     console.log();
     ask.prompt({
         message: "Enter the ID of the product you would like to buy:",
-        name: "id"
+        name: "id",
+        validate: function(input){
+            let done = this.async();
+            if(input != "QUIT" && dbIds.indexOf(parseInt(input)) == -1)
+                done(`Error, invalid ID`);
+            done(null,true);
+        }
+
     }).then((r)=>{
 
         if(r.id == "QUIT")
             con.end();
-        else{    
-            let id = parseInt(r.id);
+        else    
+            howMany(parseInt(r.id));
 
-            if(dbIds.indexOf(id) == -1){
-                console.log("ERROR, INVALID ID");
-                whatBuy();
-            } else {
-                howMany(id);
-            }
-        }
     });
 }
 
@@ -84,42 +84,45 @@ function howMany(id){
         if(err) throw err;
         ask.prompt({
             message: `How many ${entry[0].product_name} would you like to purchase?`,
-            name: "qty"
+            name: "qty",
+            validate: function(input){
+                let done = this.async();
+                let qty  = parseInt(input);
+                if(input == "QUIT")
+                    done(null,true);
+                else if(qty == "NaN")
+                    done(`Error, invalid quantity`);
+                else if(entry[0].stock_quantity < qty)
+                    done(`Error, insufficient quantity`);
+                else    
+                    done(null,true);
+
+            }
         }).then((r)=>{
             let qty = parseInt(r.qty);
-            if(qty == "NaN" || qty<=0){
-                console.log("ERROR, INVALID QUANTITY");
-                howMany(id);
-            } else {
-                
-                if(entry[0].stock_quantity < qty){
-                    console.log("ERROR, INSUFFICIENT QUANTITY");
-                    enterToContinue();
-                } else {
-                    let newQty = entry[0].stock_quantity - qty;
-                    con.query("UPDATE products SET ? WHERE ?",[
-                        {
-                            stock_quantity: newQty,
-                            product_sales : entry[0].product_sales + (entry[0].price * qty) 
+            let newQty = entry[0].stock_quantity - qty;
+            
+            con.query("UPDATE products SET ? WHERE ?",[
+                {
+                    stock_quantity: newQty,
+                    product_sales : entry[0].product_sales + (entry[0].price * qty) 
 
-                        },{
-                            id: id
-                        }
-                    ],(err,res)=>{
-                        if(err) throw err;
-                        console.log("Thanks so much for your purcase of")
-                        console.log(`${qty} ${entry[0].product_name}`);
-                        console.log(`Your total is $${entry[0].price * qty}`);
-                        enterToContinue();
-                    });
+                },{
                     
+                    id: id
                 }
+            ],(err,res)=>{
                 
-            }
+                if(err) throw err;
+                console.log("Thanks so much for your purcase of")
+                console.log(`${qty} ${entry[0].product_name}`);
+                console.log(`Your total is $${entry[0].price * qty}`);
+                enterToContinue();
+            });
+                    
         });
-
-    })
-    
+    });
+                
 }
 
 function enterToContinue(){
