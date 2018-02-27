@@ -35,8 +35,8 @@ function displayAll(arr){
         dbIds.push(i.id);
         let idSpace      = whiteSpace(i.id.toString().length,5);
         let productSpace = whiteSpace(i.product_name.length,53);
-        let priceSpace   = whiteSpace(i.price.toString().length,7);
         let price        = formatPrice(i.price)
+        let priceSpace   = whiteSpace(price.length,7);
         let sales        = formatPrice(i.product_sales)
         line();
         console.log(`${idSpace}${i.id} | ${i.product_name}${productSpace} | ${priceSpace}$${price} | $${sales}`);
@@ -113,7 +113,7 @@ function howMany(id){
                 }
             ],(err,res)=>{
                 
-                if(err) throw err;
+                if(err) throw err;x
                 console.log("Thanks so much for your purcase of")
                 console.log(`${qty} ${entry[0].product_name}`);
                 console.log(`Your total is $${entry[0].price * qty}`);
