@@ -1,15 +1,7 @@
 const ask    = require('inquirer');
 const mysql  = require('mysql');
-const cTable = require('console.table');
 
-const conCon = {
-    host: `127.0.0.1`,
-    port: `3306`,
-    user: `root`,
-    password: ``,
-    database: `bamazon`,
-    multipleStatements: true
-};
+const conCon = require('./config.js').config;
 
 const con = mysql.createConnection(conCon);
 

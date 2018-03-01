@@ -1,13 +1,6 @@
-const ask   = require('inquirer');
-const mysql = require('mysql');
-
-const conCon = {
-    host: `127.0.0.1`,
-    port: `3306`,
-    user: `root`,
-    password: ``,
-    database: `bamazon`
-};
+const ask    = require('inquirer');
+const mysql  = require('mysql');
+const conCon = require('./config.js').config;
 
 let dbIds;
 

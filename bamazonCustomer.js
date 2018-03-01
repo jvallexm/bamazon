@@ -113,7 +113,7 @@ function howMany(id){
                 }
             ],(err,res)=>{
                 
-                if(err) throw err;x
+                if(err) throw err;
                 console.log("Thanks so much for your purcase of")
                 console.log(`${qty} ${entry[0].product_name}`);
                 console.log(`Your total is $${entry[0].price * qty}`);
